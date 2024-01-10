@@ -12,17 +12,17 @@ from flask import Flask, jsonify
 #################################################
 engine = create_engine("sqlite:///SurfsUp (Challenge 10)/Resources/hawaii.sqlite")
 
-#Reflect an existing database into a new model
+#reflect database into new model
 Base = automap_base()
 
-# Reflect the tables
+# reflect tables
 Base.prepare(autoload_with=engine)
 Base.classes.keys()
-# Save references to each table
+# save references to each table
 stations = Base.classes.station
 measurements = Base.classes.measurement
 
-# Create our session (link) from Python to the DB
+# create session from Python to the DB
 session = Session(engine)
 
 #################################################
@@ -45,8 +45,8 @@ def homepage():
         f"/api/v1.0/&lt;start&gt;/&lt;end&gt;"
     )
 
-#2. Convert the query results from your precipitation analysis (i.e. retrieve only the last 12 months of data) to a dictionary using date as the key and prcp as the value.
-#Return the JSON representation of your dictionary.
+#2. convert query results from precipitation analysis to a dictionary using date as the key and prcp as the value
+# return the JSON representation of dictionary
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     mrd = session.query(measurements.date).order_by(measurements.date.desc()).first()[0]
@@ -59,7 +59,7 @@ def precipitation():
 
     return jsonify(precipitation_dict)
 
-#3. Return a JSON list of stations from the dataset.
+#3. return JSON list of stations
 @app.route("/api/v1.0/stations")
 def stations_list():
     stationdata = session.query(stations.station, stations.name).all()
@@ -68,8 +68,7 @@ def stations_list():
 
     return jsonify(stationlist)
 
-#4. Query the dates and temperature observations of the most-active station for the previous year of data.
-#Return a JSON list of temperature observations for the previous year
+#4. query dates and temp observations of the most active station for the previous year and return them
 @app.route("/api/v1.0/tobs")
 def tobs():
     #station_counts = session.query(measurements.station, func.count(measurements.station)).group_by(measurements.station).order_by(func.count(measurements.station).desc()).first()
@@ -87,9 +86,9 @@ def tobs():
     tobslist = [{"Date": date, "Temp": tobs} for date, tobs in tobsdata]
     return jsonify(tobslist)
 
-# 5. Return a JSON list of the minimum temperature, the average temperature, and the maximum temperature for a specified start or start-end range.
-#For a specified start, calculate TMIN, TAVG, and TMAX for all the dates greater than or equal to the start date.
-#For a specified start date and end date, calculate TMIN, TAVG, and TMAX for the dates from the start date to the end date, inclusive.
+# 5. return JSON list of min/max/avg temp for a specified start or start & end range
+# for a specified start calculate TMIN, TAVG, & TMAX for all the dates >= the start date
+# for a specified start and end date calculate TMIN, TAVG, & TMAX for all dates between start and end dates (inclusive)
 @app.route("/api/v1.0/<start>")
 @app.route("/api/v1.0/<start>/<end>")
 def tempstats(start, end=None):
@@ -111,7 +110,7 @@ def tempstats(start, end=None):
     #dict for temp stats
     stats_dict = {"tmin": temperature_stats[0][0], "tavg": temperature_stats[0][1], "tmax": temperature_stats[0][2]}
 
-    # Return the temperature statistics as JSON
+    # return temperature stats as JSON
     return jsonify(stats_dict)
 
 #run flask app
